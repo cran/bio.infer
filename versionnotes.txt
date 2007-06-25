@@ -1,0 +1,33 @@
+12/4/2006
+Loaded revised versions of data:
+       coef.west.wt : Full taxonomic hierarchy included (15 levels)
+       bcnt.emapw, bcnt.OR: deleted c. barr from taxa list so that
+		   results are less confusing in Sweave.
+Added output of duplicate taxa to get.taxonomic.
+
+1/10/2007
+Revised get.taxonomic to new algorithm.
+Added possibility of constructing site-taxon matrices for other taxon
+levels in makess.
+
+4/19/2007
+Changes per JSS article review:
+Changed dialogs to TclTk
+Reformatted output plots for mlsolve (bruteforce = T) and for view.te
+so that they work with Sweave
+
+5/14/2007
+Fixed error in makess and taxon.env that occurs when numeric sample
+ids are used.
+Fixed error in taxon.env in which blank space in a multivariate
+formula screen is not eliminated correctly.
+Fixed error in get.taxonomic associated with the case where two taxanames
+are listed that match with taxa on different taxonomic levels in ITIS.
+
+6/15/2007
+Added GUI interface to computing inferences
+Changed dialogs in get.taxonomic and get.otu TclTK
+	
+
+
+

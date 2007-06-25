@@ -50,7 +50,7 @@ function() {
     tkinsert(txt, "end", "Assigning operational taxonomic units...\n")
     tkgrab.release(txt)
     flush.console()
-    bcnt.otu <- get.otu(bcnt.tax, coef)
+    bcnt.otu <- get.otu(bcnt.tax, coef, gui = TRUE)
     tkinsert(txt, "end", "Computing inferences...\n")
     flush.console()
     ss <- makess(bcnt.otu)

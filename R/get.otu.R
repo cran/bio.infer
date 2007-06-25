@@ -1,5 +1,5 @@
 "get.otu" <-
-function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt") {
+function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt", gui = FALSE) {
 
   # first match species to optlist because of the strong possibility
   # of weird species names
@@ -171,8 +171,13 @@ function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt") {
 
   if (is.character(outputFile)) {
     write.table(df2, file = outputFile, sep = "\t", row.names = FALSE)
-    tkmessageBox(message = paste("Check OTU assignments in", outputFile),
-                 icon = "info", type = "ok")
+    if (gui) {
+      tkmessageBox(message = paste("Check OTU assignments in", outputFile),
+                   icon = "info", type = "ok")
+    }
+    else {
+      cat("Check OTU assignments in", outputFile, "\n")
+    }
   }
 
   if (ndc) {

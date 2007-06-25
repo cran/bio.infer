@@ -10,7 +10,8 @@
   redundant taxonomic identifications. 
 } 
 \usage{
-get.otu(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt")
+get.otu(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt",
+gui = FALSE)
 }
 
 \arguments{
@@ -25,6 +26,7 @@ get.otu(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt")
 \item{ndc }{Logical flag indicating whether OTU should be computed that
   eliminate double-counting of taxa.}
 \item{outputFile}{File name for summary output file.}
+\item{gui}{Logical indicating whether to use gui interface.}
 }
 
 \details{
