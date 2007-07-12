@@ -99,7 +99,7 @@ function(ss, coef0, site.sel = "all", bruteforce = FALSE) {
   flaginc <- rep(FALSE, times = nrow(mat2))
 
 #  if (bruteforce) {
-#    windows(height = 5, width = 5, pointsize = 10, restoreConsole = T)
+#    windows(height = 5, width = 5, pointsize = 10, restoreConsole = TRUE)
 #    par(mfrow = c(1,1), pty = "s")
 #  }
 
@@ -132,7 +132,7 @@ function(ss, coef0, site.sel = "all", bruteforce = FALSE) {
       if (nvar == 2) {
         par(mar = c(4,4,2,1))
         contour(xnew[[1]], xnew[[2]], z, nlevels = 10, main = paste(titlestr),
-                axes = F)
+                axes = FALSE)
         box(bty = "o")
         at0 <- seq(from = 0, to = 1, length = 6)
         lab01 <- round(at0*diff(coef0$xlims[[1]]) + coef0$xlims[[1]][1],
@@ -148,7 +148,7 @@ function(ss, coef0, site.sel = "all", bruteforce = FALSE) {
       else {
         par(mar = c(4,4,2,1))
         plot(xnew[[1]], z, type = "l", main = paste(titlestr), xlab = "",
-             ylab = "", axes = F)
+             ylab = "", axes = FALSE)
         at0 <- seq(from = 0, to = 1, length = 6)
         lab0 <- round(at0*diff(coef0$xlims[[1]]) + coef0$xlims[[1]][1],
                       digits = 1)

@@ -48,7 +48,7 @@ function(coef, plotform = "pdf") {
         z2 <- exp(z)/(1+exp(z))
         dim(z2) <- c(np,np)
         
-        contour(xnew, ynew, z2, axes = F)
+        contour(xnew, ynew, z2, axes = FALSE)
         at0 <- seq(from = 0, to = 1, length = 5)
         xlims <- coef$xlims
         lab1 <- round(at0*diff(xlims[[1]]) + xlims[[1]][1], digits = 0)
@@ -78,12 +78,12 @@ function(coef, plotform = "pdf") {
                                length = floor(nrow(coef$raw.data[[j]])/40)))
             cutm <- 0.5*(cutp[-1] + cutp[-length(cutp)])
             cutf <- cut(coef$raw.data[[j]][, coef$xvar[1]], cutp,
-                        include.lowest = T)
+                        include.lowest = TRUE)
             vals <- tapply(coef$raw.data[[j]][, imatch], cutf,
                            function(x) mean(as.numeric(x>0)))
-            ylim0 <- range(c(ylim0, vals), na.rm = T)
+            ylim0 <- range(c(ylim0, vals), na.rm = TRUE)
           }
-          plot(xnew, z2, axes = F, type = "l", xlab = "", ylab = "",
+          plot(xnew, z2, axes = FALSE, type = "l", xlab = "", ylab = "",
                ylim = ylim0)
           if (! is.null(coef$raw.data)) {
             points(cutm, vals)
