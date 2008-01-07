@@ -1,7 +1,10 @@
 "get.taxonomic" <-
-function(bcnt, itis.ttable, exlocal = character(0),
-         outputFile = "sum.tax.table.txt", gui = FALSE) {
+function(bcnt, itis.ttable = NULL, exlocal = character(0),
+         outputFile = "sum.tax.table.txt", gui = FALSE, txt = NULL) {
 
+  if (is.null(itis.ttable)) {
+    data(itis.ttable, envir=environment(NULL))
+  }
   names0 <- names(bcnt)
   f.tname <- names0[2]
 

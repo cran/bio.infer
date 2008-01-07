@@ -1,36 +1,45 @@
 "infergui" <-
+
 function() {
+
+  inferguienv <- environment(NULL)
+
 
   getfile <- function() {
     name <- tclvalue(tkgetOpenFile())
     if (name == "") return;
 
-    bcnt <<- read.delim(name)
+    inferguienv[["bcnt"]] <- read.delim(name)
     
-    if (ncol(bcnt) != 3) { 
-      tkmessageBox(message="Please make sure your benthic count file is tab-delimited and has the following three fields: site ID, taxon name, taxon abundance",icon="error",type="ok")
-      bcnt <<- NULL
+    if (ncol(inferguienv[["bcnt"]]) != 3) { 
+      tkmessageBox(message="Please make sure your benthic count file is tab-delimited and has only the following three fields: site ID, taxon name, taxon abundance",icon="error",type="ok")
+      inferguienv[["bcnt"]] <- NULL
     }
     
   }
 
   getfile.r <- function() {
     getfile()
-    if (! is.null(bcnt)) {
-      tkinsert(txt, "end", "Biological data loaded.\n")
+    if (! is.null(inferguienv[["bcnt"]])) {
+      tkinsert(inferguienv[["txt"]], "end", "Biological data loaded.\n")
+      tkfocus(inferguienv[["msgwin"]])
+      .Tcl("update")
       statevec <- c("normal", "disabled" ,"disabled")
-      tkdestroy(tt)
+      tkdestroy(inferguienv[["tt"]])
       draw.toplev(statevec)
     }
   }
       
   select.te <- function() {
-    data(coef.west.wt)
-    fnames <- ls(name = globalenv(), pattern = "coef")
-    tefname <<- tklist.modal("Select coefficient file:", fnames)
-    if (length(tefname) > 0) {
-      tkinsert(txt, "end", "Taxon-environment coefficient file selected.\n")
-      tkdestroy(tt)
+    data(coef.west.wt, envir = environment(NULL))
+    fnames <- ls(name = environment(NULL), pattern = "coef")
+    inferguienv[["tefname"]] <- tklist.modal("Select coefficient file:", fnames)
+    if (length(inferguienv[["tefname"]]) > 0) {
+      
+      tkinsert(inferguienv[["txt"]], "end", "Taxon-environment coefficient file selected.\n")
+#      tkgrab.release(inferguienv[["txt"]])
+      tkfocus(inferguienv[["msgwin"]])
+      tkdestroy(inferguienv[["tt"]])
       draw.toplev(c("normal", "normal", "disabled"))
     }
     else {
@@ -40,26 +49,28 @@ function() {
   }
 
   compute.inf <- function() {
-    tkconfigure(tt, cursor = "wait")
-    coef <- get(tefname)
-    data(itis.ttable)
-    tkinsert(txt, "end", "Merging biological data with ITIS...\n")
-    tkfocus(txt)
-    tkfocus(tt)
-    bcnt.tax <- get.taxonomic(bcnt, itis.ttable, gui = TRUE)
-    tkinsert(txt, "end", "Assigning operational taxonomic units...\n")
-    tkgrab.release(txt)
+    tkconfigure(inferguienv[["tt"]], cursor = "wait")
+    coef <- get(inferguienv[["tefname"]])
+#    data(itis.ttable)
+    tkinsert(inferguienv[["txt"]], "end", "Merging biological data with ITIS...\n")
+    tkfocus(inferguienv[["msgwin"]])
+    tkfocus(inferguienv[["tt"]])
+    bcnt.tax <- get.taxonomic(inferguienv[["bcnt"]], gui = TRUE, txt = inferguienv[["txt"]])
+    tkinsert(inferguienv[["txt"]], "end", "Assigning operational taxonomic units...\n")
+    tkfocus(inferguienv[["msgwin"]])
     flush.console()
     bcnt.otu <- get.otu(bcnt.tax, coef, gui = TRUE)
-    tkinsert(txt, "end", "Computing inferences...\n")
+    tkinsert(inferguienv[["txt"]], "end", "Computing inferences...\n")
+    tkfocus(inferguienv[["msgwin"]])
     flush.console()
     ss <- makess(bcnt.otu)
-    inf.out <<- mlsolve(ss, coef)
-    tkinsert(txt, "end", "Inferences computed!")
-    tkconfigure(tt, cursor = "arrow")
+    inferguienv[["inf.out"]] <- mlsolve(ss, coef)
+    tkinsert(inferguienv[["txt"]], "end", "Inferences computed!")
+    tkfocus(inferguienv[["msgwin"]])
+    tkconfigure(inferguienv[["tt"]], cursor = "arrow")
     flush.console()
-    if (! is.null(inf.out)) {
-      tkdestroy(tt)
+    if (! is.null(inferguienv[["inf.out"]])) {
+      tkdestroy(inferguienv[["tt"]])
       draw.toplev(c("normal", "normal", "normal"))
     }
   }
@@ -67,60 +78,60 @@ function() {
   export.res <- function() {
     name <- tclvalue(tkgetSaveFile())
     if (name != "") {
-      write.table(inf.out, file = name, sep = "\t",
+      write.table(inferguienv[["inf.out"]], file = name, sep = "\t",
                   row.names = FALSE)
     }
   }
 
   quitinf <- function() {
-    tkgrab.release(tt)
-    tkdestroy(tt)
-    tkdestroy(msgwin)
+    tkgrab.release(inferguienv[["tt"]])
+    tkdestroy(inferguienv[["tt"]])
+    tkdestroy(inferguienv[["msgwin"]])
   }
   
   draw.toplev <- function(statevec) {
-    tt <<- tktoplevel()
+    inferguienv[["tt"]] <- tktoplevel()
 
-    tkwm.title(tt, "Biological inferences")
-    button.widget1 <- tkbutton(tt, text = "Load biological data",
+    tkwm.title(inferguienv[["tt"]], "Biological inferences")
+    button.widget1 <- tkbutton(inferguienv[["tt"]], text = "Load biological data",
                                command = getfile.r)
     
-    button.widget2 <- tkbutton(tt,
+    button.widget2 <- tkbutton(inferguienv[["tt"]],
                                text = "Select taxon-environment relationships",
                                command = select.te, state = statevec[1])
     
-    button.widget3 <- tkbutton(tt, text = "Compute inferences",
+    button.widget3 <- tkbutton(inferguienv[["tt"]], text = "Compute inferences",
                                command = compute.inf, state = statevec[2])
     
-    button.widget4 <- tkbutton(tt, text = "Export inferences",
+    button.widget4 <- tkbutton(inferguienv[["tt"]], text = "Export inferences",
                                command = export.res, state = statevec[3])
-    button.widget5 <- tkbutton(tt, text= "Quit", command = quitinf)
+    button.widget5 <- tkbutton(inferguienv[["tt"]], text= "Quit", command = quitinf)
     
-    tkgrid(tklabel(tt, text = " "))
-    tkgrid(tklabel(tt, text = "  "), button.widget1, tklabel(tt, text = "  "))
-    tkgrid(tklabel(tt, text = " "))
-    tkgrid(tklabel(tt, text = "  "),button.widget2, tklabel(tt, text = "  "))
-    tkgrid(tklabel(tt, text = " "))
-    tkgrid(tklabel(tt, text = "  "),button.widget3, tklabel(tt, text = "  "))
-    tkgrid(tklabel(tt, text = " "))
-    tkgrid(tklabel(tt, text = "  "),button.widget4, button.widget5,
-           tklabel(tt, text = "  "))
-    tkgrid(tklabel(tt, text = " "))
+    tkgrid(tklabel(inferguienv[["tt"]], text = " "))
+    tkgrid(tklabel(inferguienv[["tt"]], text = "  "), button.widget1, tklabel(inferguienv[["tt"]], text = "  "))
+    tkgrid(tklabel(inferguienv[["tt"]], text = " "))
+    tkgrid(tklabel(inferguienv[["tt"]], text = "  "),button.widget2, tklabel(inferguienv[["tt"]], text = "  "))
+    tkgrid(tklabel(inferguienv[["tt"]], text = " "))
+    tkgrid(tklabel(inferguienv[["tt"]], text = "  "),button.widget3, tklabel(inferguienv[["tt"]], text = "  "))
+    tkgrid(tklabel(inferguienv[["tt"]], text = " "))
+    tkgrid(tklabel(inferguienv[["tt"]], text = "  "),button.widget4, button.widget5,
+           tklabel(inferguienv[["tt"]], text = "  "))
+    tkgrid(tklabel(inferguienv[["tt"]], text = " "))
   }
 
-  bcnt <<- NULL
-  tefname <<- character(0)
+  inferguienv[["bcnt"]] <- NULL
+  inferguienv[["tefname"]] <- character(0)
   statevec <- c("disabled", "disabled", "disabled")
   # Set up status window
-  msgwin <<- tktoplevel()
-  scr <- tkscrollbar(msgwin, repeatinterval=5,
-                       command=function(...)tkyview(txt,...))
-  tkwm.title(msgwin, "Messages")
-  txt <<- tktext(msgwin,yscrollcommand=function(...)tkset(scr,...))
-  tkgrid(txt, scr)
+  inferguienv[["msgwin"]] <- tktoplevel()
+  scr <- tkscrollbar(inferguienv[["msgwin"]], repeatinterval=5,
+                       command=function(...)tkyview(inferguienv[["txt"]],...))
+  tkwm.title(inferguienv[["msgwin"]], "Messages")
+  inferguienv[["txt"]] <- tktext(inferguienv[["msgwin"]],yscrollcommand=function(...)tkset(scr,...))
+  tkgrid(inferguienv[["txt"]], scr)
   tkgrid.configure(scr, sticky = "ns")
-  tkconfigure(txt, font = "courier")
-  tkinsert(txt, "end", "*** Predicting environmental conditions from biological observations ***\n")
+  tkconfigure(inferguienv[["txt"]], font = "courier")
+  tkinsert(inferguienv[["txt"]], "end", "*** Predicting environmental conditions from biological observations ***\n")
 
   draw.toplev(statevec)
 

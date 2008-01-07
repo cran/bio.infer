@@ -10,8 +10,8 @@
 } 
 
 \usage{
-get.taxonomic(bcnt, itis.ttable, exlocal = character(0),outputFile =
-"sum.tax.table.txt", gui = FALSE)
+get.taxonomic(bcnt, itis.ttable = NULL, exlocal = character(0),outputFile =
+"sum.tax.table.txt", gui = FALSE, txt = NULL)
 }
 \arguments{
   \item{bcnt }{A benthic count data frame with the following three
@@ -23,13 +23,16 @@ get.taxonomic(bcnt, itis.ttable, exlocal = character(0),outputFile =
     individuals of that taxon that were observed.
   }
   \item{itis.ttable }{Data frame with full taxonomic hierarchy. Taxonomic
-    table provided for Kingdom Animalia  \code{\link{itis.ttable}}.}
+    table provided for Kingdom Animalia
+    \code{\link{itis.ttable}}. Argument can omitted and default ITIS
+    table will be used.}
   \item{exlocal}{Vector of character strings specifying strings that
     should not be saved as species names. Some strings have already been
   specified, such as 'SPP' and 'GROUP'}
   \item{outputFile}{File name for output of summary taxonomic table.}
   \item{gui}{Logical variable telling whether script is called from
     TclTK GUI front end}
+  \item{txt}{TclTK text window variable for running in GUI mode}
 }
 
 \details{
@@ -63,7 +66,7 @@ get.taxonomic(bcnt, itis.ttable, exlocal = character(0),outputFile =
 data(bcnt.OR)
 data(itis.ttable)
 \dontrun{
-bcnt.tax.OR <- get.taxonomic(bcnt.OR, itis.ttable)
+bcnt.tax.OR <- get.taxonomic(bcnt.OR)
 }
 }
 \seealso{\code{\link{itis.ttable}}}

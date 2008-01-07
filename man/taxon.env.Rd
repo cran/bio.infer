@@ -34,8 +34,8 @@ env.siteid,tlevs = "all", dumpdata = FALSE)
   This script generates logistic regression models for taxa at various levels of
   taxonomic resolution (as specified by the user).  The script
   computes the degrees of freedom specified by the model ($df$) and
-  selects taxa that occur in at least $10 \times df$ and is absent from at
-  least $10 \times df$ sites.  Then, logistic regression models based on
+  selects taxa that occur in at least 10 times df and is absent from at
+  least 10 times df sites.  Then, logistic regression models based on
   the formula specified by the user are
   computed for each taxon using \code{\link{glm}}.
   The user can select the taxonomic levels (e.g., CLASS, ORDER, SPECIES,
