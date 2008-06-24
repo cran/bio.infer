@@ -10,7 +10,7 @@ function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt", gui = FAL
   abnid <- names0[3]
 
   # Correct for entering coefficient file name
-  if (! is.null(optlist$tnames)) {
+  if (is.list(optlist)) {
     optlist <- optlist$tnames
   }
 
