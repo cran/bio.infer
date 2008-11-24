@@ -57,7 +57,8 @@ function(bcnt, itis.ttable, exlocal = character(0),
 
   # First guess at species names
   exlist <- c("DUPLICATE", "SETAE", "CODE", "GROUP", "TYPE", "GENUS",
-              "PANEL", "SAND", "TURRET", "CASE", "LARVAE", toupper(exlocal))
+              "PANEL", "SAND", "TURRET", "CASE", "LARVAE", "ADULT",
+              toupper(exlocal))
   sp.name <- rep("", times = length(substr[[1]]))
   if (length(substr) > 1) {
     for (i in 1:length(substr[[1]])) {
@@ -79,19 +80,13 @@ function(bcnt, itis.ttable, exlocal = character(0),
 
   #Check for any compound taxa
   #Only allow compound taxa up to the same family
-  imatch <- match("FAMILY", toupper(tlevs))
-  tlevs.loc <- tlevs[length(tlevs):imatch]
+  imatch <- match("SUBCLASS", toupper(tlevs))
+  tlevs.loc <- rev(tlevs[length(tlevs):imatch])
   for (i in 1:nrow(dfref)) {
     if (nchar(substr[[2]][i]) > 3) {
       imatch1 <- match(substr[[1]][i], itis.taxa)
       imatch2 <- match(substr[[2]][i], itis.taxa)
-      if (is.na(imatch1) | is.na(imatch2)) {
-        if (! is.na(imatch2)) {
-          dfref$f2[i] <- substr[[2]][i]
-          dfref$sp.name[i] <- ""
-        }
-      }
-      else {
+      if (! is.na(imatch1) & ! is.na(imatch2)) {
         comp1 <- itis.ttable[imatch1, tlevs.loc]
         comp2 <- itis.ttable[imatch2, tlevs.loc]
         tlev.sav <- ""
@@ -99,15 +94,36 @@ function(bcnt, itis.ttable, exlocal = character(0),
           if (! is.na(comp1[j]) & ! is.na(comp2[j])) {
             if ((comp1[j] == comp2[j]) & (comp1[j] != "")) {
               tlev.sav <- tlevs.loc[j]
-              break
             }
           }
-          if (tlev.sav != "") {
-            dfref$f2[i] <- comp1[,tlev.sav]
+        }
+        if (tlev.sav != "") {
+          dfref$f2[i] <- comp1[,tlev.sav]
+          dfref$sp.name[i] <- ""
+        }
+        # default here if both strings match to something
+        # but a common higher level is not found is genus.species
+      }
+      else {
+        if (!is.na(imatch1)) {
+          # check whether first string is a genus
+          if (is.na(itis.ttable[imatch1, "GENUS"])) {
+            dfref$sp.name[i] <- ""
+          }
+          else {
+            if (itis.ttable[imatch1, "GENUS"] == "") {
+              dfref$sp.name[i] <- ""
+            }
+          }
+        }
+        else {
+          if (! is.na(imatch2)) {
+            dfref$f2[i] <- substr[[2]][i]
             dfref$sp.name[i] <- ""
           }
         }
       }
+
     }
   }
 
@@ -200,8 +216,8 @@ function(bcnt, itis.ttable, exlocal = character(0),
       df1 <- merge(dfref, itis.ttable, by.x = "f2", by.y = "TAXON", all.x = TRUE)
       nomatch <- is.na(df1[, tlevs[1]])
       
-      df2 <- merge(bcnt, dfref, by.x = f.tname, by.y = "f1", all.x = T)
-      df2 <- merge(df2, itis.ttable, by.x = "f2", by.y = "TAXON", all.x = T)
+      df2 <- merge(bcnt, dfref, by.x = f.tname, by.y = "f1", all.x = TRUE)
+      df2 <- merge(df2, itis.ttable, by.x = "f2", by.y = "TAXON", all.x = TRUE)
       
       incvec <- is.na(df2[, tlevs[1]])
       if (sum(incvec) > 0) {
@@ -273,7 +289,7 @@ function(bcnt, itis.ttable, exlocal = character(0),
   # Eliminate fields with no entries
   iomit <- numeric(0)
   for (i in 1:length(tlevs)) {
-    if (sum(itis.ttable.loc[, tlevs[i]] != "", na.rm = T) == 0) {
+    if (sum(itis.ttable.loc[, tlevs[i]] != "", na.rm = TRUE) == 0) {
       iomit <- c(iomit,i)
     }
   }
@@ -286,6 +302,7 @@ function(bcnt, itis.ttable, exlocal = character(0),
                all.x = TRUE)
   df1$SPECIES <- paste(df1$GENUS, df1$sp.name, sep = ".")
   incvec <- (nchar(df1$sp.name) > 0) & (df1$GENUS != "")
+  incvec[is.na(incvec)] <- FALSE
   df1$SPECIES[! incvec] <- ""
   dfref <- df1[, c("f1", "f2", "SPECIES")]
 
@@ -295,12 +312,12 @@ function(bcnt, itis.ttable, exlocal = character(0),
   names(df1) <- c(tlevs, "SPECIES", f.tname)
 
   if (is.character(outputFile)) {
-    write.table(df1, sep = "\t", file = outputFile, row.names = F)
+    write.table(df1, sep = "\t", file = outputFile, row.names = FALSE)
     tkmessageBox(message = paste("Check final taxa name assignments in", outputFile), icon = "info", type = "ok")
   }
-  df2 <- merge(bcnt, dfref, by.x = f.tname, by.y = "f1", all.x = T)
+  df2 <- merge(bcnt, dfref, by.x = f.tname, by.y = "f1", all.x = TRUE)
 
-  df2 <- merge(df2, itis.ttable.loc, by.x = "f2", by.y = "TAXON", all.x = T)
+  df2 <- merge(df2, itis.ttable.loc, by.x = "f2", by.y = "TAXON", all.x = TRUE)
 
   varlist <- c(tlevs, "SPECIES")
 
