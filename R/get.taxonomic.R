@@ -80,50 +80,51 @@ function(bcnt, itis.ttable, exlocal = character(0),
 
   #Check for any compound taxa
   #Only allow compound taxa up to the same family
-  imatch <- match("SUBCLASS", toupper(tlevs))
-  tlevs.loc <- rev(tlevs[length(tlevs):imatch])
-  for (i in 1:nrow(dfref)) {
-    if (nchar(substr[[2]][i]) > 3) {
-      imatch1 <- match(substr[[1]][i], itis.taxa)
-      imatch2 <- match(substr[[2]][i], itis.taxa)
-      if (! is.na(imatch1) & ! is.na(imatch2)) {
-        comp1 <- itis.ttable[imatch1, tlevs.loc]
-        comp2 <- itis.ttable[imatch2, tlevs.loc]
+  if (length(substr) > 1) {
+    imatch <- match("SUBCLASS", toupper(tlevs))
+    tlevs.loc <- rev(tlevs[length(tlevs):imatch])
+    for (i in 1:nrow(dfref)) {
+      if (nchar(substr[[2]][i]) > 3) {
+        imatch1 <- match(substr[[1]][i], itis.taxa)
+        imatch2 <- match(substr[[2]][i], itis.taxa)
+        if (! is.na(imatch1) & ! is.na(imatch2)) {
+          comp1 <- itis.ttable[imatch1, tlevs.loc]
+          comp2 <- itis.ttable[imatch2, tlevs.loc]
         tlev.sav <- ""
-        for (j in 1:length(comp1)){
-          if (! is.na(comp1[j]) & ! is.na(comp2[j])) {
-            if ((comp1[j] == comp2[j]) & (comp1[j] != "")) {
-              tlev.sav <- tlevs.loc[j]
+          for (j in 1:length(comp1)){
+            if (! is.na(comp1[j]) & ! is.na(comp2[j])) {
+              if ((comp1[j] == comp2[j]) & (comp1[j] != "")) {
+                tlev.sav <- tlevs.loc[j]
+              }
             }
           }
-        }
-        if (tlev.sav != "") {
-          dfref$f2[i] <- comp1[,tlev.sav]
+          if (tlev.sav != "") {
+            dfref$f2[i] <- comp1[,tlev.sav]
           dfref$sp.name[i] <- ""
-        }
+          }
         # default here if both strings match to something
         # but a common higher level is not found is genus.species
-      }
-      else {
-        if (!is.na(imatch1)) {
+        }
+        else {
+          if (!is.na(imatch1)) {
           # check whether first string is a genus
-          if (is.na(itis.ttable[imatch1, "GENUS"])) {
-            dfref$sp.name[i] <- ""
+            if (is.na(itis.ttable[imatch1, "GENUS"])) {
+              dfref$sp.name[i] <- ""
+            }
+            else {
+              if (itis.ttable[imatch1, "GENUS"] == "") {
+                dfref$sp.name[i] <- ""
+              }
+            }
           }
           else {
-            if (itis.ttable[imatch1, "GENUS"] == "") {
+            if (! is.na(imatch2)) {
+              dfref$f2[i] <- substr[[2]][i]
               dfref$sp.name[i] <- ""
             }
           }
         }
-        else {
-          if (! is.na(imatch2)) {
-            dfref$f2[i] <- substr[[2]][i]
-            dfref$sp.name[i] <- ""
-          }
-        }
       }
-
     }
   }
 
