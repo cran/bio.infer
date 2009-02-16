@@ -1,12 +1,12 @@
 # 1.7.2009
 # Select coefficient file from those available
 
-sel.coeffile <- function() {
+sel.coeffile <- function(fstring = "coef") {
 
-  path <- R.home()
-  flist <- system(paste("ls ", path, "//library//bio.infer//data", sep = ""),
-                  intern = TRUE)
-  incvec <- substring(flist, 1, 4) == "coef"
+  temp <- data(package = "bio.infer")
+  flist <- temp$results[,3]
+
+  incvec <- substring(flist, 1, 4) == fstring
 
   flist <- flist[incvec]
 

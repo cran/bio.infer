@@ -21,9 +21,8 @@ function() {
   getfile.r <- function() {
     getfile()
     if (! is.null(inferguienv[["bcnt"]])) {
-      tkinsert(inferguienv[["txt"]], "end", "Biological data loaded.\n")
-      tkfocus(inferguienv[["msgwin"]])
-      .Tcl("update")
+      #tkinsert(inferguienv[["txt"]], "end", "Biological data loaded.\n")
+      cat("Biological data loaded.\n")
       statevec <- c("normal", "disabled" ,"disabled")
       tkdestroy(inferguienv[["tt"]])
       draw.toplev(statevec)
@@ -31,14 +30,15 @@ function() {
   }
       
   select.te <- function() {
-    data(coef.west.wt, envir = environment(NULL))
-    fnames <- ls(name = environment(NULL), pattern = "coef")
-    inferguienv[["tefname"]] <- tklist.modal("Select coefficient file:", fnames)
+    inferguienv[["tefname"]] <- sel.coeffile()
+
     if (length(inferguienv[["tefname"]]) > 0) {
+#      tkinsert(inferguienv[["txt"]], "end", "Taxon-environment coefficient file selected.\n")
+      data(list = inferguienv[["tefname"]])
+      cat("Taxon-environment coefficient file selected.\n")
       
-      tkinsert(inferguienv[["txt"]], "end", "Taxon-environment coefficient file selected.\n")
 #      tkgrab.release(inferguienv[["txt"]])
-      tkfocus(inferguienv[["msgwin"]])
+#      tkfocus(inferguienv[["msgwin"]])
       tkdestroy(inferguienv[["tt"]])
       draw.toplev(c("normal", "normal", "disabled"))
     }
@@ -52,21 +52,22 @@ function() {
     tkconfigure(inferguienv[["tt"]], cursor = "wait")
     coef <- get(inferguienv[["tefname"]])
 #    data(itis.ttable)
-    tkinsert(inferguienv[["txt"]], "end", "Merging biological data with ITIS...\n")
-    tkfocus(inferguienv[["msgwin"]])
+#    tkinsert(inferguienv[["txt"]], "end", "Merging biological data with ITIS...\n")
+#    tkfocus(inferguienv[["msgwin"]])
     tkfocus(inferguienv[["tt"]])
-    bcnt.tax <- get.taxonomic(inferguienv[["bcnt"]], gui = TRUE, txt = inferguienv[["txt"]])
-    tkinsert(inferguienv[["txt"]], "end", "Assigning operational taxonomic units...\n")
-    tkfocus(inferguienv[["msgwin"]])
+    bcnt.tax <- get.taxonomic(inferguienv[["bcnt"]])
+#    tkinsert(inferguienv[["txt"]], "end", "Assigning operational taxonomic units...\n")
+#    tkfocus(inferguienv[["msgwin"]])
     flush.console()
     bcnt.otu <- get.otu(bcnt.tax, coef, gui = TRUE)
-    tkinsert(inferguienv[["txt"]], "end", "Computing inferences...\n")
-    tkfocus(inferguienv[["msgwin"]])
+#    tkinsert(inferguienv[["txt"]], "end", "Computing inferences...\n")
+#    tkfocus(inferguienv[["msgwin"]])
     flush.console()
     ss <- makess(bcnt.otu)
     inferguienv[["inf.out"]] <- mlsolve(ss, coef)
-    tkinsert(inferguienv[["txt"]], "end", "Inferences computed!")
-    tkfocus(inferguienv[["msgwin"]])
+#    tkinsert(inferguienv[["txt"]], "end", "Inferences computed!")
+    cat("Inferences computed!\n")
+#    tkfocus(inferguienv[["msgwin"]])
     tkconfigure(inferguienv[["tt"]], cursor = "arrow")
     flush.console()
     if (! is.null(inferguienv[["inf.out"]])) {
@@ -86,13 +87,13 @@ function() {
   quitinf <- function() {
     tkgrab.release(inferguienv[["tt"]])
     tkdestroy(inferguienv[["tt"]])
-    tkdestroy(inferguienv[["msgwin"]])
+#    tkdestroy(inferguienv[["msgwin"]])
   }
   
   draw.toplev <- function(statevec) {
     inferguienv[["tt"]] <- tktoplevel()
 
-    tkwm.title(inferguienv[["tt"]], "Biological inferences")
+    tkwm.title(inferguienv[["tt"]], "PECBO")
     button.widget1 <- tkbutton(inferguienv[["tt"]], text = "Load biological data",
                                command = getfile.r)
     
@@ -123,15 +124,6 @@ function() {
   inferguienv[["tefname"]] <- character(0)
   statevec <- c("disabled", "disabled", "disabled")
   # Set up status window
-  inferguienv[["msgwin"]] <- tktoplevel()
-  scr <- tkscrollbar(inferguienv[["msgwin"]], repeatinterval=5,
-                       command=function(...)tkyview(inferguienv[["txt"]],...))
-  tkwm.title(inferguienv[["msgwin"]], "Messages")
-  inferguienv[["txt"]] <- tktext(inferguienv[["msgwin"]],yscrollcommand=function(...)tkset(scr,...))
-  tkgrid(inferguienv[["txt"]], scr)
-  tkgrid.configure(scr, sticky = "ns")
-  tkconfigure(inferguienv[["txt"]], font = "courier")
-  tkinsert(inferguienv[["txt"]], "end", "*** Predicting environmental conditions from biological observations ***\n")
 
   draw.toplev(statevec)
 

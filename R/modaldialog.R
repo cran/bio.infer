@@ -19,7 +19,7 @@ function(title,itemlist,entryInit,entryWidth=20,
 
   tkgrid(tklabel(dlg,text="       "))
   for (i in 1:length(itemlist)) {
-    textEntryVarTcl[[i]] <- tclVar(paste(entryInit))
+    textEntryVarTcl[[i]] <- tclVar(paste(entryInit[i]))
     textEntryWidget[[i]] <- tkentry(dlg,width=paste(entryWidth),
                                textvariable=textEntryVarTcl[[i]])
     tkgrid(tklabel(dlg,text=itemlist[i]),textEntryWidget[[i]])
