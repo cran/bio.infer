@@ -26,4 +26,6 @@ export("resolve.mult")
 export("parse.taxon.name")
 export("load.itis")
 export("incorp.correct")
+export("trait.stat")
+
 
