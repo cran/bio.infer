@@ -13,18 +13,20 @@ get.taxonomic <- function(bcnt) {
   
   parse.list <- get.valid.names(df.parse, get.tax.env)
 
-  if (nrow(parse.list[[2]]) > 0) {
-  
-    # resolve records with multiple valid ITIS entries
-    parse.list <- resolve.mult(parse.list, get.tax.env)
-
+  if (length(parse.list) > 1) {
     if (nrow(parse.list[[2]]) > 0) {
+      
+      # resolve records with multiple valid ITIS entries
+      parse.list <- resolve.mult(parse.list, get.tax.env)
+
+      if (nrow(parse.list[[2]]) > 0) {
     # prompt user to correct misspellings
-      tname.new <- correct.taxanames(sort(unique(parse.list[[2]][,2])),
+        tname.new <- correct.taxanames(sort(unique(parse.list[[2]][,2])),
                                      get.tax.env)
 
     # incorporate corrected spellings
-      parse.list <- incorp.correct(tname.new, parse.list)
+        parse.list <- incorp.correct(tname.new, parse.list)
+      }
     }
   }
 
