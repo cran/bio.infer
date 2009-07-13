@@ -15,7 +15,7 @@ trait.stat <- function(bcnt.otu, coefs) {
   
   traitval.u <- character(0)
   repeat{
-    w <- regexpr("[A-Z]+", temp)
+    w <- regexpr("[A-Za-z]+", temp)
     if (sum(w!=-1) == 0) break
     traitval.u <- c(traitval.u,substring(temp, w, w+attributes(w)$match.length-
                                           1))
@@ -25,7 +25,7 @@ trait.stat <- function(bcnt.otu, coefs) {
   traitval.u <- sort(unique(traitval.u))
 
   if (!is.factor(bcnt.otu[,1])) {
-    bcnt.otu <- factor(bcnt.otu[,1])
+    bcnt.otu[,1] <- factor(bcnt.otu[,1])
   }
 
   bcnt.t <- merge(bcnt.otu, coefs, by.x = "OTU", by.y="TAXON", all.x = T)
