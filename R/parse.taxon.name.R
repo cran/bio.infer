@@ -166,7 +166,7 @@ locate.dupes <- function(fulltab) {
   isav <- numeric(0)
   if (length(t.sel) > 0) {
     for (i in 1:length(t.sel)) {
-      isav <- (1:nrow(fulltab))[t.sel[i] == fulltab$TAXON]
+      isav <- c(isav, (1:nrow(fulltab))[t.sel[i] == fulltab$TAXON])
     }
     for (i in 1:length(isav)) {
       stringtemp <- fulltab[isav[i], c("TAXON", "FAMILY", "ORDER",
@@ -183,16 +183,26 @@ get.dupe.sel <- function(sumstr) {
   isel <- numeric(0)
   if (length(sumstr > 0)) {
     w <- regexpr("-", sumstr)
-    TAXON <- substring(sumstr, 1, w-1)
+    TAXON <- substring(sumstr, 1, w - 1)
+    ntax <- length(unique(TAXON))
     repeat {
-      a <- tklist.modal("Select appropriate taxon", sumstr)
-      for (i in 1:length(a)) {
-        isel <- c(isel, match(a[i], sumstr))
+      a <- tklist.modal("Select appropriate taxon", sumstr, 
+                        selectmode = "multiple")
+      if (length(a) == ntax) {
+        for (i in 1:length(a)) {
+          isel <- c(isel, match(a[i], sumstr))
+        }
+        if (sum(duplicated(TAXON[isel])) > 0) {
+          cat("Please select only one choice per taxon name\n")
+          flush.console()
+          isel <- numeric(0)
+        }
+        else break
       }
-      if (sum(duplicated(TAXON[isel])) > 0) {
-        cat("Select only one choice per taxon name\n")
+      else {
+        cat("Please select one choice per taxon name\n")
+        flush.console()
       }
-      else break
     }
   }
   return(a)
@@ -258,7 +268,7 @@ correct.taxanames <- function(tname.old, get.tax.env) {
   tname.new <- tname.old
   repeat {
     tname.new <- modalDialog("Enter corrections", tname.old,
-                              tname.new)
+                              tname.new, returnValOnCancel = tname.old)
     tname.new <- toupper(tname.new)
     in.mat.correct <- in.ITIS(tname.new, get.tax.env)
     if (sum(! in.mat.correct) > 0) {
