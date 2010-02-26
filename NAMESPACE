@@ -27,5 +27,7 @@ export("parse.taxon.name")
 export("load.itis")
 export("incorp.correct")
 export("trait.stat")
+export("flist.data")
+export("flist.match")
 
 
