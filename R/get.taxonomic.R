@@ -6,7 +6,14 @@ get.taxonomic <- function(bcnt) {
   names0 <- names(bcnt)
   get.tax.env <- environment(NULL)
   tlevs <- load.itis(get.tax.env)
-  
+
+  # check for duplicate name with ITIS
+  for (i in 1:length(names0)) {
+    if (names0[i] %in% tlevs) {
+      names0[i] <- paste(names0[i], "orig", sep = ".")
+    }
+  }
+  names(bcnt) <- names0
   
   tname <- get.taxon.names(bcnt)
   df.parse <- parse.taxon.name(tname)

@@ -23,51 +23,53 @@ function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt", gui = FAL
       spec <- sort(unique(bcnt$SPECIES))
       name.orig <- character(0)
       name.change <- character(0)
-      for (i in 1:length(spec)) {
-        if (is.na(match(spec[i], optlist.spec))) {
-          w <- regexpr("\\.", spec[i])
-          gen <- substring(spec[i], 1, w-1)
-          spec.half <- substring(spec[i], w+1, nchar(spec[i]))
-          opt.sel <- character(0)
-          speclist <- as.list(rep(NA, times = 1))
-          k <- 1
-          repeat{
-            w2 <- regexpr("[A-Z]+", spec.half)
-            if (w2 == -1) break
-            speclist[[k]] <- substring(spec.half, w2,
-                                       w2+attributes(w2)$match.length-1)
-            spec.half <- substring(spec.half, w2+attributes(w2)$match.length,
-                                   nchar(spec.half))
-            k <- k+1
-          }
-          ind1 <- grep(gen, optlist.spec)
-          if (length(ind1) > 0) {
-            ind.sel <- ind1
-            for (k in 1:length(speclist)) {
-              ind2 <- grep(speclist[[k]], optlist.spec)
-              ind.all <- c(ind.sel, ind2)
-              ind.sel <- ind.all[duplicated(ind.all)]
+      if (length(spec) > 0) {
+        for (i in 1:length(spec)) {
+          if (is.na(match(spec[i], optlist.spec))) {
+            w <- regexpr("\\.", spec[i])
+            gen <- substring(spec[i], 1, w-1)
+            spec.half <- substring(spec[i], w+1, nchar(spec[i]))
+            opt.sel <- character(0)
+            speclist <- as.list(rep(NA, times = 1))
+            k <- 1
+            repeat{
+              w2 <- regexpr("[A-Z]+", spec.half)
+              if (w2 == -1) break
+              speclist[[k]] <- substring(spec.half, w2,
+                                         w2+attributes(w2)$match.length-1)
+              spec.half <- substring(spec.half, w2+attributes(w2)$match.length,
+                                     nchar(spec.half))
+              k <- k+1
             }
-            opt.sel <- c(opt.sel, optlist.spec[ind.sel])
-          }
-
-          if (length(opt.sel) > 0) {
-            if (length(opt.sel) > 1) {
-              specnew <- select.list(c(opt.sel, "NONE"),
-                                     preselect = "NONE",
-                                     title = paste(spec[i]))
+            ind1 <- grep(gen, optlist.spec)
+            if (length(ind1) > 0) {
+              ind.sel <- ind1
+              for (k in 1:length(speclist)) {
+                ind2 <- grep(speclist[[k]], optlist.spec)
+                ind.all <- c(ind.sel, ind2)
+                ind.sel <- ind.all[duplicated(ind.all)]
+              }
+              opt.sel <- c(opt.sel, optlist.spec[ind.sel])
             }
-            else {
-              specnew <- opt.sel
-            }
-            if ((specnew != "") & (specnew != "NONE")) {
-                 # get rid of special characters in spec[i]
-              spec[i] <- gsub("\\(", ".", spec[i])
-              incvec <- regexpr(spec[i], bcnt$SPECIES) != -1
-              incvec[is.na(incvec)] <- FALSE
-              name.orig <- c(name.orig, spec[i])
-              name.change <- c(name.change, specnew)
-              bcnt$SPECIES[incvec] <- toupper(specnew)
+            
+            if (length(opt.sel) > 0) {
+              if (length(opt.sel) > 1) {
+                specnew <- select.list(c(opt.sel, "NONE"),
+                                       preselect = "NONE",
+                                       title = paste(spec[i]))
+              }
+              else {
+                specnew <- opt.sel
+              }
+              if ((specnew != "") & (specnew != "NONE")) {
+                                        # get rid of special characters in spec[i]
+                spec[i] <- gsub("\\(", ".", spec[i])
+                incvec <- regexpr(spec[i], bcnt$SPECIES) != -1
+                incvec[is.na(incvec)] <- FALSE
+                name.orig <- c(name.orig, spec[i])
+                name.change <- c(name.change, specnew)
+                bcnt$SPECIES[incvec] <- toupper(specnew)
+              }
             }
           }
         }
