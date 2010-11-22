@@ -10,41 +10,57 @@ load.itis <- function(get.tax.env) {
 }
 
 parse.taxon.name <- function(tname.orig) {
+    tname <- toupper(tname.orig)
+    substr <- as.list(rep(NA, times = 1))
+    i <- 1
+    w1 <- regexpr("\\(", tname)
+    w2 <- regexpr("\\)", tname)
+    incvec <- (w1 != -1) & (w2 != -1)
+    tname[incvec] <- paste(substring(tname[incvec], 1, w1[incvec] - 
+                                     1), substring(tname[incvec], w2[incvec] + 1, nchar(tname[incvec])))
+    repeat {
+      w <- regexpr("[A-Z]+", tname)
+      if (sum(w != -1) == 0) 
+        break
+      substr[[i]] <- substring(tname, w, w + attributes(w)$match.length - 
+                               1)
+      w3 <- w + attributes(w)$match.length
+      tname <- substring(tname, w3, nchar(tname))
+      if (sum(tname != "") == 0) 
+        break
+      i <- i + 1
+    }
+    substr[[i]] <- rep("", times = length(tname)) # add vector of blanks at the end
+    df.parse <- matrix("", ncol = length(substr) + 1, nrow = length(tname))
+    df.parse[, 1] <- tname.orig
+    exlist <- c("DUPLICATE", "SETAE", "CODE", "GROUP", "TYPE", 
+        "GENUS", "PANEL", "SAND", "TURRET", "CASE", "LARVAE", 
+        "ADULT", "SENSU", "TZING", "RIBAUD", "RPEL", "STRUP", "NAWQA",
+                "LLER","KANSSON", "UMICH", "ALBE" )
+    for (i in 1:length(substr)) {
+      incvec <- substr[[i]] %in% exlist | ((nchar(substr[[i]]) <= 3) &
+                                           (nchar(substr[[i]]) > 0))
+      incvec[is.na(incvec)] <- F
+      while(sum(incvec) > 0) {
+        if (i < (length(substr)-1)) {
+          for (j in i:(length(substr)-1)) {
+            substr[[j]][incvec] <- substr[[j+1]][incvec]
+          }
+        }
+        else {
+          substr[[i]][incvec] <- ""
+        }
+        incvec <- substr[[i]] %in% exlist | ((nchar(substr[[i]]) <= 3) &
+                                             (nchar(substr[[i]]) > 0))
+        incvec[is.na(incvec)] <- F
+      }
+    }
 
-  tname <- toupper(tname.orig)
-  substr <- as.list(rep(NA, times = 1))
-  i <- 1
-  w1 <- regexpr("\\(", tname)
-  w2 <- regexpr("\\)", tname)
-  incvec <- (w1 != -1) & (w2 != -1)
-  tname[incvec] <- paste(substring(tname[incvec], 1, w1[incvec] - 
-        1), substring(tname[incvec], w2[incvec] + 1, nchar(tname[incvec])))
-  repeat {
-    w <- regexpr("[A-Z]+", tname)
-    if (sum(w != -1) == 0) 
-      break
-    substr[[i]] <- substring(tname, w, w + attributes(w)$match.length - 
-                             1)
-    w3 <- w + attributes(w)$match.length
-    tname <- substring(tname, w3, nchar(tname))
-    if (sum(tname != "") == 0) 
-      break
-    i <- i + 1
-  }
-  df.parse <- matrix("", ncol = length(substr) +1, nrow = length(tname))
-  df.parse[,1] <- tname.orig
-  exlist <- c("DUPLICATE", "SETAE", "CODE", "GROUP", "TYPE", 
-              "GENUS", "PANEL", "SAND", "TURRET", "CASE", "LARVAE", 
-              "ADULT")
-  for (i in 1:length(substr)) {
-    incvec <- substr[[i]] %in% exlist
-    substr[[i]][incvec] <- ""
-    incvec <- nchar(substr[[i]]) <= 3
-    substr[[i]][incvec] <- ""
-    df.parse[,i+1] <- substr[[i]]
-  }
-  df.parse <- data.frame(df.parse, stringsAsFactors = FALSE)
-  return(df.parse)
+    for (i in 1:length(substr)) {
+      df.parse[, i + 1] <- substr[[i]]
+    }
+    df.parse <- data.frame(df.parse, stringsAsFactors = FALSE)
+    return(df.parse)
 }
 
 in.ITIS <- function(df.parse,get.tax.env, col.sel = NULL) {
@@ -129,34 +145,41 @@ make.fulltab1 <- function(df.parse, get.tax.env) {
 
 # make species names
 make.species <- function(df.parse, fulltab) {
-  df.parse <- data.frame(df.parse, stringsAsFactors = FALSE)
-  names0 <- names(df.parse)
-  names0 <- paste("t", 1:length(names0), sep = "")
-  names0[1] <- "taxaname.orig"
-  names0[2] <- "TAXON"
-  names(df.parse) <- names0
-  df1 <- merge(df.parse, fulltab, by = "TAXON")
-  incvec <- ! is.na(df1$GENUS)
-  df1$SPECIES <- rep(NA, times = nrow(df1))
-  incvec2 <- df1$t3 != ""
-  incvec.a <- incvec & incvec2
-  df1$SPECIES[incvec.a] <- paste(df1$GENUS[incvec.a],
-                                     df1$t3[incvec.a], sep = ".")
-  df1$TAXON[incvec.a] <- df1$SPECIES[incvec.a]
-
-  npos <- sum((nchar(names(df1)) == 2) &
-              (substring(names(df1),1,1) == "t"))
-  if (npos > 1) {
-    for (i in 2:npos) {
-      fname <- paste("t", npos+2, sep = "")
-      incvec2 <- df1[,fname] != ""
-      incvec.a <- incvec & incvec2
-      df1$SPECIES[incvec.a] <- paste(df1$SPECIES[incvec.a],
-                                         df1[incvec.a,fname], sep = "/")
-      df1$TAXON[incvec.a] <- df1$SPECIES[incvec.a]
+    df.parse <- data.frame(df.parse, stringsAsFactors = FALSE)
+    names0 <- names(df.parse)
+    names0 <- paste("t", 1:length(names0), sep = "")
+    names0[1] <- "taxaname.orig"
+    names0[2] <- "TAXON"
+    names(df.parse) <- names0
+    df1 <- merge(df.parse, fulltab, by = "TAXON")
+    incvec <- !is.na(df1$GENUS)
+    df1$SPECIES <- rep(NA, times = nrow(df1))
+    incvec2 <- df1$t3 != ""
+    incvec.a <- incvec & incvec2
+    df1$SPECIES[incvec.a] <- paste(df1$GENUS[incvec.a], df1$t3[incvec.a], 
+        sep = ".")
+    df1$TAXON[incvec.a] <- df1$SPECIES[incvec.a]
+    npos <- sum((nchar(names(df1)) == 2) & (substring(names(df1), 
+        1, 1) == "t"))
+    tname.orig.cap <- toupper(df1$taxaname.orig)
+    if (npos > 1) {
+        for (i in 2:npos) {
+            fname <- paste("t", i + 2, sep = "")
+            incvec2 <- df1[, fname] != ""
+            w <- rep(-1, times = length(tname.orig.cap))
+            for (j in 1:length(tname.orig.cap)) {
+              w[j] <- regexpr(df1[j, fname], tname.orig.cap[j])
+            }
+            # check to see if substring is capitalized in taxaname.orig
+            # if so, do not add as a species name
+            incvec3 <- regexpr("[A-Z]+", substring(df1$taxaname.orig,w,w)) == -1
+            incvec.a <- incvec & incvec2 & incvec3
+            df1$SPECIES[incvec.a] <- paste(df1$SPECIES[incvec.a], 
+                df1[incvec.a, fname], sep = "/")
+            df1$TAXON[incvec.a] <- df1$SPECIES[incvec.a]
+        }
     }
-  }
-  return(df1)
+    return(df1)
 }
 
 # identify duplicates and return row numbers and summary string
