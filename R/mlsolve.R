@@ -139,8 +139,8 @@ function(ss, coef0, site.sel = "all", bruteforce = FALSE) {
                       digits = 1)
         lab02 <- round(at0*diff(coef0$xlims[[2]]) + coef0$xlims[[2]][1],
                       digits = 1)
-        axis(1, at = at0, lab = lab01)
-        axis(2, at= at0, lab = lab02)
+        axis(1, at = at0, labels = lab01)
+        axis(2, at= at0, labels = lab02)
         mtext(coef0$xvar[1], side = 1, line = 2.3)
         mtext(coef0$xvar[2], side = 2, line = 2.3)
 
@@ -152,7 +152,7 @@ function(ss, coef0, site.sel = "all", bruteforce = FALSE) {
         at0 <- seq(from = 0, to = 1, length = 6)
         lab0 <- round(at0*diff(coef0$xlims[[1]]) + coef0$xlims[[1]][1],
                       digits = 1)
-        axis(1, at = at0, lab = lab0)
+        axis(1, at = at0, labels = lab0)
         axis(2)
         box(bty = "l")
         mtext(coef0$xvar[1], side = 1, line = 2.3)
@@ -164,7 +164,7 @@ function(ss, coef0, site.sel = "all", bruteforce = FALSE) {
     liksav <- rep(NA, times = nrow(xstart.d))
     for (kk in 1:nrow(xstart.d)) {
       xg <- drop(xstart.d[kk,])
-      o.out <- optim(xg, loglik, g = loglik.g, method = "L-BFGS-B",
+      o.out <- optim(xg, loglik, gr = loglik.g, method = "L-BFGS-B",
                      lower = rep(0, times = nvar),upper = rep(1, times = nvar),
                      c=c, y=mat2[j,],
                      control = list(fnscale = -1))

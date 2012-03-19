@@ -1,0 +1,13 @@
+bcnt.OR
+bcnt.emapw
+bcnt.otu.OR
+bcnt.tax.OR
+coef.east.sed
+coef.west.wt
+envdata.OR
+envdata.emapw
+itis.ttable.old: itis.ttable
+itis.ttable
+ss.OR
+trait.feeding
+trait.habit
