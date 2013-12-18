@@ -16,25 +16,25 @@ parse.taxon.name <- function(tname.orig) {
     w1 <- regexpr("\\(", tname)
     w2 <- regexpr("\\)", tname)
     incvec <- (w1 != -1) & (w2 != -1)
-    tname[incvec] <- paste(substring(tname[incvec], 1, w1[incvec] - 
+    tname[incvec] <- paste(substring(tname[incvec], 1, w1[incvec] -
                                      1), substring(tname[incvec], w2[incvec] + 1, nchar(tname[incvec])))
     repeat {
       w <- regexpr("[A-Z]+", tname)
-      if (sum(w != -1) == 0) 
+      if (sum(w != -1) == 0)
         break
-      substr[[i]] <- substring(tname, w, w + attributes(w)$match.length - 
+      substr[[i]] <- substring(tname, w, w + attributes(w)$match.length -
                                1)
       w3 <- w + attributes(w)$match.length
       tname <- substring(tname, w3, nchar(tname))
-      if (sum(tname != "") == 0) 
+      if (sum(tname != "") == 0)
         break
       i <- i + 1
     }
     substr[[i]] <- rep("", times = length(tname)) # add vector of blanks at the end
     df.parse <- matrix("", ncol = length(substr) + 1, nrow = length(tname))
     df.parse[, 1] <- tname.orig
-    exlist <- c("DUPLICATE", "SETAE", "CODE", "GROUP", "TYPE", 
-        "GENUS", "PANEL", "SAND", "TURRET", "CASE", "LARVAE", 
+    exlist <- c("DUPLICATE", "SETAE", "CODE", "GROUP", "TYPE",
+        "GENUS", "PANEL", "SAND", "TURRET", "CASE", "LARVAE",
         "ADULT", "SENSU", "TZING", "RIBAUD", "RPEL", "STRUP", "NAWQA",
                 "LLER","KANSSON", "UMICH", "ALBE" )
     for (i in 1:length(substr)) {
@@ -112,11 +112,11 @@ resolve.mult <- function(parse.list, get.tax.env) {
         tlev.o1[!is.na(comp1[j])] <- j
         tlev.o2[!is.na(comp2[j])] <- j
       }
-      
+
       incvec1 <- tlev.sav != 0
       incvec2 <- abs(tlev.o1 - tlev.sav) < 5
       incvec.all <- incvec1 & incvec2
-      
+
       x <- tlevs.loc[tlev.sav[incvec.all]]
       ind <- imatch1[incvec.all]
       str.save <- rep("", times = length(x))
@@ -156,10 +156,10 @@ make.species <- function(df.parse, fulltab) {
     df1$SPECIES <- rep(NA, times = nrow(df1))
     incvec2 <- df1$t3 != ""
     incvec.a <- incvec & incvec2
-    df1$SPECIES[incvec.a] <- paste(df1$GENUS[incvec.a], df1$t3[incvec.a], 
+    df1$SPECIES[incvec.a] <- paste(df1$GENUS[incvec.a], df1$t3[incvec.a],
         sep = ".")
     df1$TAXON[incvec.a] <- df1$SPECIES[incvec.a]
-    npos <- sum((nchar(names(df1)) == 2) & (substring(names(df1), 
+    npos <- sum((nchar(names(df1)) == 2) & (substring(names(df1),
         1, 1) == "t"))
     tname.orig.cap <- toupper(df1$taxaname.orig)
     if (npos > 1) {
@@ -174,7 +174,7 @@ make.species <- function(df.parse, fulltab) {
             # if so, do not add as a species name
             incvec3 <- regexpr("[A-Z]+", substring(df1$taxaname.orig,w,w)) == -1
             incvec.a <- incvec & incvec2 & incvec3
-            df1$SPECIES[incvec.a] <- paste(df1$SPECIES[incvec.a], 
+            df1$SPECIES[incvec.a] <- paste(df1$SPECIES[incvec.a],
                 df1[incvec.a, fname], sep = "/")
             df1$TAXON[incvec.a] <- df1$SPECIES[incvec.a]
         }
@@ -207,10 +207,14 @@ get.dupe.sel <- function(sumstr) {
   if (length(sumstr > 0)) {
     w <- regexpr("-", sumstr)
     TAXON <- substring(sumstr, 1, w - 1)
+    selvec <- TAXON == ""
+    TAXON <- TAXON[!selvec]
     ntax <- length(unique(TAXON))
     repeat {
-      a <- tklist.modal("Select appropriate taxon", sumstr, 
-                        selectmode = "multiple")
+#      a <- tklist.modal("Select appropriate taxon", sumstr,
+#                        selectmode = "multiple")
+        a <- select.list(sumstr, multiple = TRUE,
+                         title = "Select appropriate taxon")
       if (length(a) == ntax) {
         for (i in 1:length(a)) {
           isel <- c(isel, match(a[i], sumstr))
@@ -256,7 +260,7 @@ get.taxon.names <- function(bcnt) {
       tname.a <- sort(unique(bcnt[, f.tname]))
     }
     else {
-      tkmessageBox(message = "2nd field is neither factor nor character", 
+      tkmessageBox(message = "2nd field is neither factor nor character",
                    icon = "error", type = "ok")
     }
   }
@@ -289,23 +293,27 @@ correct.taxanames <- function(tname.old, get.tax.env) {
   # This version checks each name for presence in ITIS
   # The java version will not
   tname.new <- tname.old
+  dfedit <- data.frame(Orig.Taxon.Name = tname.old, Rev.Taxon.Name = tname.new,
+                       stringsAsFactors = F)
   repeat {
-    tname.new <- modalDialog("Enter corrections", tname.old,
-                              tname.new, returnValOnCancel = tname.old)
-    tname.new <- toupper(tname.new)
+#    tname.new <- modalDialog("Enter corrections", tname.old,
+#                              tname.new, returnValOnCancel = tname.old)
+      dfedit <- fix(dfedit)
+      tname.new <- toupper(as.character(dfedit[,2]))
+#    tname.new <- toupper(tname.new)
     in.mat.correct <- in.ITIS(tname.new, get.tax.env)
     if (sum(! in.mat.correct) > 0) {
       cat("The following taxa are not in ITIS:\n")
       cat(tname.new[!in.mat.correct], sep = "\n")
       flush.console()
     }
-    done0 <- tkmessageBox(message = "Are you done editing?", 
+    done0 <- tkmessageBox(message = "Are you done editing?",
                           icon = "question", type = "yesno", default = "yes")
     if (as.character(done0) == "yes")  break
   }
   return(tname.new)
 }
-  
+
 
 output.tax.table <- function(finaltab, tlevs) {
   tlevs.loc <- c(tlevs, "SPECIES", "TAXON", "taxaname.orig")
@@ -326,5 +334,5 @@ incorp.correct <- function(tname.new, parse.list) {
   parse.list[[2]] <- parse.list[[2]][rep(F,times = nrow(parse.list[[2]])),]
   return(parse.list)
 }
-  
-  
+
+

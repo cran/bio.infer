@@ -173,13 +173,8 @@ function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt", gui = FAL
 
   if (is.character(outputFile)) {
     write.table(df2, file = outputFile, sep = "\t", row.names = FALSE)
-    if (gui) {
-      tkmessageBox(message = paste("Check OTU assignments in", outputFile),
-                   icon = "info", type = "ok")
-    }
-    else {
       cat("Check OTU assignments in", outputFile, "\n")
-    }
+
   }
 
   if (ndc) {

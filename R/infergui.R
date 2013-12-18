@@ -10,12 +10,12 @@ function() {
     if (name == "") return;
 
     inferguienv[["bcnt"]] <- read.delim(name)
-    
-    if (ncol(inferguienv[["bcnt"]]) != 3) { 
+
+    if (ncol(inferguienv[["bcnt"]]) != 3) {
       tkmessageBox(message="Please make sure your benthic count file is tab-delimited and has only the following three fields: site ID, taxon name, taxon abundance",icon="error",type="ok")
       inferguienv[["bcnt"]] <- NULL
     }
-    
+
   }
 
   getfile.r <- function() {
@@ -28,15 +28,15 @@ function() {
       draw.toplev(statevec)
     }
   }
-      
+
   select.te <- function() {
     inferguienv[["tefname"]] <- sel.coeffile()
 
     if (length(inferguienv[["tefname"]]) > 0) {
 #      tkinsert(inferguienv[["txt"]], "end", "Taxon-environment coefficient file selected.\n")
-      data(list = inferguienv[["tefname"]])
+      data(list = inferguienv[["tefname"]], envir = inferguienv)
       cat("Taxon-environment coefficient file selected.\n")
-      
+
 #      tkgrab.release(inferguienv[["txt"]])
 #      tkfocus(inferguienv[["msgwin"]])
       tkdestroy(inferguienv[["tt"]])
@@ -89,25 +89,25 @@ function() {
     tkdestroy(inferguienv[["tt"]])
 #    tkdestroy(inferguienv[["msgwin"]])
   }
-  
+
   draw.toplev <- function(statevec) {
     inferguienv[["tt"]] <- tktoplevel()
 
     tkwm.title(inferguienv[["tt"]], "PECBO")
     button.widget1 <- tkbutton(inferguienv[["tt"]], text = "Load biological data",
                                command = getfile.r)
-    
+
     button.widget2 <- tkbutton(inferguienv[["tt"]],
                                text = "Select taxon-environment relationships",
                                command = select.te, state = statevec[1])
-    
+
     button.widget3 <- tkbutton(inferguienv[["tt"]], text = "Compute inferences",
                                command = compute.inf, state = statevec[2])
-    
+
     button.widget4 <- tkbutton(inferguienv[["tt"]], text = "Export inferences",
                                command = export.res, state = statevec[3])
     button.widget5 <- tkbutton(inferguienv[["tt"]], text= "Quit", command = quitinf)
-    
+
     tkgrid(tklabel(inferguienv[["tt"]], text = " "))
     tkgrid(tklabel(inferguienv[["tt"]], text = "  "), button.widget1, tklabel(inferguienv[["tt"]], text = "  "))
     tkgrid(tklabel(inferguienv[["tt"]], text = " "))

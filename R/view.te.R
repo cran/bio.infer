@@ -36,18 +36,18 @@ function(coef, plotform = "pdf") {
   if (length(tnames0) > 0) {
     for (i in 1:length(tnames0)) {
       if ((plotform == "windows") & (i > 2) & (floor((i-1)/2) == (i-1)/2)) {
-        windows(width = 6, height = 3, pointsize = 10)
+          dev.new()
         par(mfrow = c(1,2), pty = "m", mar = c(4,4,2,0))
       }
       isel <- match(tnames0[i], coef$tnames)
       cc <- coef$csave[isel,]
-      
+
       if (length(coef$xvar) == 2) {
         z <- cc[1] + cc[2]*df1$x + cc[3]*(df1$x^2) + cc[4]*df1$y +
           cc[5]*(df1$y^2) + cc[6]*df1$x*df1$y
         z2 <- exp(z)/(1+exp(z))
         dim(z2) <- c(np,np)
-        
+
         contour(xnew, ynew, z2, axes = FALSE)
         at0 <- seq(from = 0, to = 1, length = 5)
         xlims <- coef$xlims

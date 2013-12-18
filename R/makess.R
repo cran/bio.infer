@@ -35,7 +35,7 @@ function(bcnt,tname = "OTU", plothist=FALSE,prints=FALSE,nview=0) {
 
   abund.all <- bcnt[, abund]
   ss1 <- matrix(0, ncol = ntaxa, nrow = numsites)
-  
+
   for (j in 1:ntaxa) {
     flush.console()
     incvec <- taxa.all == taxa.u[j]
@@ -60,7 +60,8 @@ function(bcnt,tname = "OTU", plothist=FALSE,prints=FALSE,nview=0) {
   df3 <- merge(df1, df2, by = "sitenames.u")
   prop.t <- df3$totabund.t/df3$totabund.r
   if( plothist ){
-    windows(width = 4, height = 4, pointsize = 10, restoreConsole = TRUE)
+#    windows(width = 4, height = 4, pointsize = 10, restoreConsole = TRUE)
+    dev.new()
     hist(prop.t, xlab = "Proportion of abundance",
          main = "OTU abundance/total abundance" )
   } else {
@@ -69,7 +70,7 @@ function(bcnt,tname = "OTU", plothist=FALSE,prints=FALSE,nview=0) {
     attr( ss.df, "histogram" ) <- dfhist
   }
   if( prints ){
-    cat("Summary statistics for OTU abundance/total abundance\n") 
+    cat("Summary statistics for OTU abundance/total abundance\n")
     print(summary(prop.t))
     cat("Taxa lists at sites in which OTU abundance is low can be informative.\n")
   } else {
@@ -78,7 +79,7 @@ function(bcnt,tname = "OTU", plothist=FALSE,prints=FALSE,nview=0) {
 
   if (nview > 0) {
     df3 <- df3[order(prop.t), ]
-    
+
     for (i in 1:nview) {
       if (is.factor(df3$sitenames.u)) {
         siteid <- levels(df3$sitenames.u)[df3$sitenames.u][i]
