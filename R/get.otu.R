@@ -1,5 +1,5 @@
 "get.otu" <-
-function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt", gui = FALSE) {
+function(bcnt, optlist = NULL, ndc = TRUE, outputFile = FALSE, gui = FALSE) {
 
   # first match species to optlist because of the strong possibility
   # of weird species names
@@ -51,7 +51,7 @@ function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt", gui = FAL
               }
               opt.sel <- c(opt.sel, optlist.spec[ind.sel])
             }
-            
+
             if (length(opt.sel) > 0) {
               if (length(opt.sel) > 1) {
                 specnew <- select.list(c(opt.sel, "NONE"),
@@ -95,7 +95,7 @@ function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt", gui = FAL
 
   lookup <- unique.data.frame(data.frame(tname, bcnt[, nameid]))
   names(lookup) <- c("TNAME", "TAXANAME")
-  
+
   # Calculate the number of occurrences of each taxonname
   getocc <- function(x) length(unique(x))
   numocc <- tapply(bcnt[, siteid], tname, getocc)
@@ -126,7 +126,7 @@ function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt", gui = FAL
 
   in.all <- rep(TRUE, times = nrow(df2))
   otufin2 <- rep(NA, times = nrow(df2))
-  
+
   for (i in 1:(length(tlev)-1)) {
     taxa.all <- df2[, tlev[i]]
     taxa.red <- taxa.all[in.all]
@@ -134,7 +134,7 @@ function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt", gui = FAL
     #print(taxa.u)
 
     in.all.n <- in.all
-    
+
     for (j in 1:length(taxa.u)) {
       incvec <- taxa.all == taxa.u[j]
       incvec[is.na(incvec)] <- FALSE
@@ -171,9 +171,9 @@ function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt", gui = FAL
 
   df2 <- df2[do.call(order, df2[, tlev]),]
 
-  if (is.character(outputFile)) {
-    write.table(df2, file = outputFile, sep = "\t", row.names = FALSE)
-      cat("Check OTU assignments in", outputFile, "\n")
+  if (outputFile) {
+    write.table(df2, file = "sum.otu.txt", sep = "\t", row.names = FALSE)
+      cat("Check OTU assignments in sum.otu.txt\n")
 
   }
 
@@ -186,7 +186,7 @@ function(bcnt, optlist = NULL, ndc = TRUE, outputFile = "sum.otu.txt", gui = FAL
   names(df3) <- c("TNAME", "OTU")
   bcnt <- data.frame(bcnt, tname)
   bcnt <- merge(df3, bcnt, by.x = "TNAME",  by.y = "tname")
-  
+
   return(bcnt[, c(siteid,  nameid, abnid, "TNAME", "OTU")])
 }
 

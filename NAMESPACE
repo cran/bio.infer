@@ -1,4 +1,11 @@
 import(tcltk)
+importFrom("grDevices", "dev.new", "dev.off", "pdf")
+importFrom("graphics", "axis", "box", "contour", "hist", "mtext",
+             "par", "points")
+importFrom("stats", "D", "as.formula", "coef", "glm", "na.omit",
+             "optim", "predict", "quantile")
+importFrom("utils", "data", "fix", "flush.console", "read.delim",
+             "select.list", "write.table")
 export("get.otu")
 export("get.taxonomic")
 export("makess")

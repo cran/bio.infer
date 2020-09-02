@@ -1,11 +1,11 @@
-d3271b0a0417ef9f0612bc46c63616bb *DESCRIPTION
-f846af1f7502f9d98efab26279c6df31 *NAMESPACE
+1871f36d4d9ec7938f2516e777897c70 *DESCRIPTION
+d1ae8fee39718f681113e4de06ce23e0 *NAMESPACE
 64bf036e3bc939cbd29d6d7cb2ef50c5 *R/flist.data.R
 5b49b239a02c14eb00f2881a2696745d *R/flist.match.R
 07c582004823fedb1c8ec9dee9afd218 *R/formtomat.R
-b8e7c582ee1aac1b340abb0d7941dd33 *R/get.otu.R
+d0d1ac65a58ec575f6375586a8bb7c21 *R/get.otu.R
 763bf6c4a282ff6d5f111b58623e3077 *R/get.taxonomic.R
-53b4259c67517071839875aa8fb91046 *R/infergui.R
+855d250ffb09b9bce8a74ffd9dcbae71 *R/infergui.R
 dfcbb78d62e0275d44dfc00f6e579d97 *R/load.revised.otu.R
 8a2a7e0b0f5caf5b589b94a8484e45e3 *R/load.revised.species.R
 c159c23f7375b6aa98cd284f3ad7db5e *R/makess.R
@@ -16,7 +16,7 @@ f35de05e9cdcd5277e77aa76f622e4bf *R/sel.coeffile.R
 551787ed806d90c4b4d57eb89330f354 *R/taxon.env.R
 cb18c0ecbc41002c8264ac376f17150b *R/tklist.modal.R
 4bf743351d5edeff8c38990a4e2cf806 *R/trait.stat.R
-5a8afd934ab4622874a617a818aed3db *R/view.te.R
+a86e2df366a7824c05c3d73bfa54fcdf *R/view.te.R
 998af20e77ef7d9af056f5dd6b263abb *data/bcnt.OR.rda
 56d603a80178816d7cd56ff0238a7d21 *data/bcnt.emapw.rda
 17ee9b53d85af107565a7419d5cd6704 *data/bcnt.otu.OR.rda
@@ -45,7 +45,7 @@ d61a7e844fcdcc949736685346ab11a9 *man/flist.data.Rd
 b1e23afd293d62e8c6ca9202929cbd80 *man/flist.match.Rd
 a5aaa02bbb1d70df4806c845e3b00abe *man/formtomat.Rd
 3bc1e9aa8895313c1db27eccd68876de *man/get.dupe.sel.Rd
-7e1865e54c789544bde66e15d691ae65 *man/get.otu.Rd
+b6de39136b5d33979cf0647388aec03f *man/get.otu.Rd
 7abbff120e83c42cf8cb37d69bc94e95 *man/get.taxon.names.Rd
 72b0319fdeab294a3b77a83ffc2d1aa3 *man/get.taxonomic.Rd
 4481cf9fdbac6d2dae8e825cc3a98f1a *man/get.valid.names.Rd

@@ -7,14 +7,15 @@ function() {
 
   getfile <- function() {
     name <- tclvalue(tkgetOpenFile())
-    if (name == "") return;
+    if (name == "") return();
 
     inferguienv[["bcnt"]] <- read.delim(name)
 
     if (ncol(inferguienv[["bcnt"]]) != 3) {
       tkmessageBox(message="Please make sure your benthic count file is tab-delimited and has only the following three fields: site ID, taxon name, taxon abundance",icon="error",type="ok")
       inferguienv[["bcnt"]] <- NULL
-    }
+  }
+    return()
 
   }
 
@@ -26,7 +27,8 @@ function() {
       statevec <- c("normal", "disabled" ,"disabled")
       tkdestroy(inferguienv[["tt"]])
       draw.toplev(statevec)
-    }
+  }
+    return()
   }
 
   select.te <- function() {
@@ -45,7 +47,8 @@ function() {
     else {
       tkmessageBox(message = "Select coefficient file to continue",
                    icon = "error", type = "ok")
-    }
+  }
+    return()
   }
 
   compute.inf <- function() {
@@ -73,7 +76,8 @@ function() {
     if (! is.null(inferguienv[["inf.out"]])) {
       tkdestroy(inferguienv[["tt"]])
       draw.toplev(c("normal", "normal", "normal"))
-    }
+  }
+    return()
   }
 
   export.res <- function() {
@@ -81,13 +85,14 @@ function() {
     if (name != "") {
       write.table(inferguienv[["inf.out"]], file = name, sep = "\t",
                   row.names = FALSE)
-    }
+  }
+    return()
   }
 
   quitinf <- function() {
     tkgrab.release(inferguienv[["tt"]])
     tkdestroy(inferguienv[["tt"]])
-#    tkdestroy(inferguienv[["msgwin"]])
+    return()
   }
 
   draw.toplev <- function(statevec) {
@@ -126,6 +131,7 @@ function() {
   # Set up status window
 
   draw.toplev(statevec)
+  return()
 
 
 }

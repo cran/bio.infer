@@ -107,7 +107,8 @@ function(coef, plotform = "pdf") {
   }
   if (plotform == "pdf") {
     dev.off()
-  }
+}
+  return()
 
 }
 
